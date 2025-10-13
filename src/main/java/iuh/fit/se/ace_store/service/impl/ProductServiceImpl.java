@@ -74,6 +74,16 @@ public class ProductServiceImpl implements ProductService {
         product.setMonitor(dto.getMonitor());
         product.setOs(dto.getOs());
 
+        if (images != null && !images.isEmpty()) {
+            List<String> imageUrls = cloudinaryService.uploadFiles(images, "image");
+            product.setImages(imageUrls);
+        }
+
+        if (videos != null && !videos.isEmpty()) {
+            List<String> videoUrls = cloudinaryService.uploadFiles(videos, "video");
+            product.setVideos(videoUrls);
+        }
+
         Product updated = productRepository.save(product);
         return dto;
     }
