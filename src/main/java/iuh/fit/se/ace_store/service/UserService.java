@@ -1,4 +1,4 @@
-package iuh.fit.se.ace_store.service.impl;
+package iuh.fit.se.ace_store.service;
 
 import iuh.fit.se.ace_store.dto.request.LoginRequest;
 import iuh.fit.se.ace_store.dto.request.RegisterRequest;
