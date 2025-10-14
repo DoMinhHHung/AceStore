@@ -5,25 +5,28 @@ import iuh.fit.se.ace_store.dto.request.RegisterRequest;
 import iuh.fit.se.ace_store.dto.response.UserResponse;
 import iuh.fit.se.ace_store.entity.User;
 import iuh.fit.se.ace_store.repository.UserRepository;
+import iuh.fit.se.ace_store.service.EmailService;
 import iuh.fit.se.ace_store.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final EmailService emailService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
 
     @Override
     public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail()) || userRepository.existsByPhone(request.getPhone())) {
-            throw new RuntimeException("Email hoặc số điện thoại đã tồn tại!");
+            throw new RuntimeException("Email or Phone is already exists!!!");
         }
-
         User user = User.builder()
                 .email(request.getEmail())
                 .phone(request.getPhone())
@@ -38,8 +41,45 @@ public class UserServiceImpl implements UserService {
                 .provider(User.AuthProvider.LOCAL)
                 .build();
 
+        // token xác minh (hết hạn sau 1 tiếng)
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+        user.setTokenExpiration(LocalDateTime.now().plusHours(1));
+
         userRepository.save(user);
 
+        String verifyLink = "http://localhost:8080/api/auth/verify?token=" + token;
+
+        String html = """
+            <h3>Xin chào %s,</h3>
+            <p>Cảm ơn bạn đã đăng ký tại <b>PC-Store</b>!</p>
+            <p>Nhấn vào link bên dưới để xác nhận tài khoản (hết hạn sau 1 tiếng):</p>
+            <a href="%s">Xác nhận tài khoản</a>
+            """.formatted(user.getFirstName(), verifyLink);
+
+        emailService.sendHtmlEmail(user.getEmail(), "Xác nhận tài khoản - PC Store", html);
+
+        return toResponse(user);
+    }
+
+    @Override
+    public UserResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getUsername())
+                .or(() -> userRepository.findByPhone(request.getUsername()))
+                .orElseThrow(() -> new RuntimeException("Account not exists!!!"));
+
+        if (!user.isEnabled()) {
+            throw new RuntimeException("Account not activated yet! Check your email.");
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Wrong password!!!");
+        }
+
+        return toResponse(user);
+    }
+
+    private UserResponse toResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -49,28 +89,6 @@ public class UserServiceImpl implements UserService {
                 .dob(user.getDob())
                 .gender(user.getGender())
                 .address(user.getAddress())
-                .role(user.getRole().name())
-                .enabled(user.isEnabled())
-                .provider(user.getProvider().name())
-                .build();
-    }
-
-    @Override
-    public UserResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getUsername())
-                .or(() -> userRepository.findByPhone(request.getUsername()))
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Sai mật khẩu!");
-        }
-
-        return UserResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
                 .role(user.getRole().name())
                 .enabled(user.isEnabled())
                 .provider(user.getProvider().name())

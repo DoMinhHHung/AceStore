@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table( name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = {"email", "provider"}) } )
 @Data
@@ -35,4 +37,24 @@ public class User {
     private String providerId;
     // Enum roles
     public enum Role { USER, ADMIN } // Enum AuthProvider
-    public enum AuthProvider { LOCAL, GOOGLE } }
+    public enum AuthProvider { LOCAL, GOOGLE }
+
+    private String verificationToken;
+    private LocalDateTime tokenExpiration;
+    public class VerificationToken {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        @Column(nullable = false, unique = true)
+        private String token;
+
+        @OneToOne(fetch = FetchType.EAGER)
+        @JoinColumn(nullable = false, name = "user_id")
+        private User user;
+
+        @Column(nullable = false)
+        private LocalDateTime expiryDate;
+    }
+}
+
