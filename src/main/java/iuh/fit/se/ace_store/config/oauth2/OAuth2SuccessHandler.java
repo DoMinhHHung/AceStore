@@ -2,6 +2,8 @@ package iuh.fit.se.ace_store.config.oauth2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import iuh.fit.se.ace_store.entity.User;
+import iuh.fit.se.ace_store.entity.enums.AuthProvider;
+import iuh.fit.se.ace_store.entity.enums.Role;
 import iuh.fit.se.ace_store.repository.UserRepository;
 import iuh.fit.se.ace_store.service.EmailService;
 import iuh.fit.se.ace_store.service.JwtService;
@@ -49,9 +51,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .email(email)
                     .firstName(name)
                     .lastName("")
-                    .provider(User.AuthProvider.GOOGLE)
+                    .provider(AuthProvider.GOOGLE)
                     .enabled(true)
-                    .role(User.Role.USER)
+                    .role(Role.USER)
                     .build();
 
             userRepository.save(user);

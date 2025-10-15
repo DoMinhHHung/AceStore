@@ -4,6 +4,8 @@ import iuh.fit.se.ace_store.dto.request.LoginRequest;
 import iuh.fit.se.ace_store.dto.request.RegisterRequest;
 import iuh.fit.se.ace_store.dto.response.UserResponse;
 import iuh.fit.se.ace_store.entity.User;
+import iuh.fit.se.ace_store.entity.enums.AuthProvider;
+import iuh.fit.se.ace_store.entity.enums.Role;
 import iuh.fit.se.ace_store.repository.UserRepository;
 import iuh.fit.se.ace_store.service.EmailService;
 import iuh.fit.se.ace_store.service.UserService;
@@ -36,9 +38,9 @@ public class UserServiceImpl implements UserService {
                 .gender(request.getGender())
                 .address(request.getAddress())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(User.Role.USER)
+                .role(Role.USER)
                 .enabled(false)
-                .provider(User.AuthProvider.LOCAL)
+                .provider(AuthProvider.LOCAL)
                 .build();
 
         // token xác minh (hết hạn sau 1 tiếng)

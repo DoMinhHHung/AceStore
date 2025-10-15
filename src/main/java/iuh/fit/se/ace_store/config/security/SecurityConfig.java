@@ -1,4 +1,4 @@
-package iuh.fit.se.ace_store.config;
+package iuh.fit.se.ace_store.config.security;
 
 import iuh.fit.se.ace_store.config.oauth2.OAuth2SuccessHandler;
 import iuh.fit.se.ace_store.config.security.JwtAuthentication;

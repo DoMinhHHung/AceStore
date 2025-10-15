@@ -1,6 +1,8 @@
 package iuh.fit.se.ace_store.config.oauth2;
 
 import iuh.fit.se.ace_store.entity.User;
+import iuh.fit.se.ace_store.entity.enums.AuthProvider;
+import iuh.fit.se.ace_store.entity.enums.Role;
 import iuh.fit.se.ace_store.repository.UserRepository;
 import iuh.fit.se.ace_store.service.EmailService;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +38,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .firstName(firstName)
                     .lastName(lastName)
                     .enabled(true)
-                    .provider(User.AuthProvider.GOOGLE)
-                    .role(User.Role.USER)
+                    .provider(AuthProvider.GOOGLE)
+                    .role(Role.USER)
                     .build();
             userRepository.save(newUser);
 

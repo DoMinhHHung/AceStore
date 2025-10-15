@@ -1,5 +1,7 @@
 package iuh.fit.se.ace_store.entity;
 
+import iuh.fit.se.ace_store.entity.enums.AuthProvider;
+import iuh.fit.se.ace_store.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,26 +37,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
     private String providerId;
-    // Enum roles
-    public enum Role { USER, ADMIN } // Enum AuthProvider
-    public enum AuthProvider { LOCAL, GOOGLE }
-
     private String verificationToken;
     private LocalDateTime tokenExpiration;
-    public class VerificationToken {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-
-        @Column(nullable = false, unique = true)
-        private String token;
-
-        @OneToOne(fetch = FetchType.EAGER)
-        @JoinColumn(nullable = false, name = "user_id")
-        private User user;
-
-        @Column(nullable = false)
-        private LocalDateTime expiryDate;
-    }
 }
 
