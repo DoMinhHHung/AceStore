@@ -2,6 +2,7 @@ package iuh.fit.se.ace_store.controller;
 
 import iuh.fit.se.ace_store.dto.request.LoginRequest;
 import iuh.fit.se.ace_store.dto.request.RegisterRequest;
+import iuh.fit.se.ace_store.dto.response.ApiResponse;
 import iuh.fit.se.ace_store.dto.response.AuthResponseDTO;
 import iuh.fit.se.ace_store.dto.response.UserResponse;
 import iuh.fit.se.ace_store.entity.User;
@@ -32,60 +33,61 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(userService.register(request));
+    public ResponseEntity<ApiResponse> register(@RequestBody RegisterRequest request) {
+        try {
+            UserResponse response = userService.register(request);
+            return ResponseEntity.ok(new ApiResponse(true, null, "Đăng ký thành công! Vui lòng kiểm tra email để xác thực.", null, response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "REGISTER_ERROR", e.getMessage(), "Kiểm tra lại thông tin đăng ký.", null));
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest request) {
+    try {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
+            new UsernamePasswordAuthenticationToken(
+                request.getUsername(),
+                request.getPassword()
+            )
         );
-
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
         String accessToken = jwtService.generateToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
-
         AuthResponseDTO response = new AuthResponseDTO(accessToken, refreshToken, "Bearer");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse(true, null, "Đăng nhập thành công!", null, response));
+    } catch (RuntimeException e) {
+        String action = e.getMessage().contains("activated") ? "Vui lòng kiểm tra email để xác thực tài khoản." : null;
+        return ResponseEntity.badRequest().body(new ApiResponse(false, "LOGIN_ERROR", e.getMessage(), action, null));
+    }
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
-        User user = userRepository.findByVerificationToken(token)
-                .orElse(null);
-
-        if (user == null) {
-            return ResponseEntity.badRequest().body("❌ Token không hợp lệ!");
-        }
-
-        if (user.getTokenExpiration().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.badRequest().body("⏰ Token đã hết hạn rồi bro!");
-        }
-
-        user.setEnabled(true);
-        user.setVerificationToken(null);
-        user.setTokenExpiration(null);
-        userRepository.save(user);
-
-        // Gửi mail cảm ơn sau khi xác nhận
-        String subject = "🎉 Chào mừng bạn đến với PC-Store!";
-        String content = """
-                <h2>Chào mừng %s!</h2>
-                <p>Tài khoản của bạn đã được kích hoạt thành công.</p>
-                <p>Giờ bạn có thể đăng nhập và bắt đầu mua sắm ngay!</p>
-                """.formatted(user.getFirstName());
-        emailService.sendHtmlEmail(user.getEmail(), subject, content);
-
-        return ResponseEntity.ok("✅ Tài khoản của bạn đã được xác nhận thành công!");
+    public ResponseEntity<ApiResponse> verifyEmail(@RequestParam("token") String token) {
+    User user = userRepository.findByVerificationToken(token)
+        .orElse(null);
+    if (user == null) {
+        return ResponseEntity.badRequest().body(new ApiResponse(false, "VERIFY_TOKEN_INVALID", "Token không hợp lệ!", "Vui lòng đăng ký lại hoặc kiểm tra email xác thực.", null));
+    }
+    if (user.getTokenExpiration().isBefore(LocalDateTime.now())) {
+        return ResponseEntity.badRequest().body(new ApiResponse(false, "VERIFY_TOKEN_EXPIRED", "Token đã hết hạn!", "Vui lòng đăng ký lại để nhận email xác thực mới.", null));
+    }
+    user.setEnabled(true);
+    user.setVerificationToken(null);
+    user.setTokenExpiration(null);
+    userRepository.save(user);
+    String subject = "🎉 Chào mừng bạn đến với PC-Store!";
+    String content = """
+        <h2>Chào mừng %s!</h2>
+        <p>Tài khoản của bạn đã được kích hoạt thành công.</p>
+        <p>Giờ bạn có thể đăng nhập và bắt đầu mua sắm ngay!</p>
+        """.formatted(user.getFirstName());
+    emailService.sendHtmlEmail(user.getEmail(), subject, content);
+    return ResponseEntity.ok(new ApiResponse(true, null, "Tài khoản của bạn đã được xác nhận thành công!", null, null));
     }
 
     @GetMapping("/success")
-    public ResponseEntity<String> loginSuccess() {
-        return ResponseEntity.ok("Google login successful!");
+    public ResponseEntity<ApiResponse> loginSuccess() {
+        return ResponseEntity.ok(new ApiResponse(true, null, "Google login successful!", null, null));
     }
 }
