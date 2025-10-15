@@ -1,7 +1,11 @@
+## 1. Cấu hình file application.properties
+- Sử dụng file 'applicationExample.properties' đổi thành 'application.properties' và thay thế các value trong đó
 
-## 1. Hướng dẫn test API với Postman
-- {{base-url}} = http://locahost:8080
-### 1.1. Đăng nhập và lấy token
+## 2. Hướng dẫn test API với Postman
+
+    {{base-url}} = http://locahost:8080
+
+### 2.1. Đăng nhập và lấy token
 
 - Gửi POST tới: `{{base-url}}/ace/auth/login`
 - Body (JSON):
@@ -15,7 +19,7 @@
 
 - Lấy token từ response để sử dụng cho các API cần xác thực.
 
-### 1.2. Test API sản phẩm
+### 2.2. Test API sản phẩm
 
 - **Tạo sản phẩm**
 
@@ -34,7 +38,7 @@
   - Method: GET
   - URL: `{{base-url}}/ace/products`
 
-### 1.3. Test API user
+### 2.3. Test API user
 
 - **Cập nhật thông tin cá nhân**
   - Method: PUT
@@ -66,7 +70,7 @@
 }
 ```
 
-### 1.4. Test API admin
+### 2.4. Test API admin
 
 - **Lấy danh sách user**
 
