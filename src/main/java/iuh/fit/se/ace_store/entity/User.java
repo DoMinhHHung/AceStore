@@ -32,6 +32,7 @@ public class User {
     private String gender;
     private String address;
     private String password;
+    @Enumerated(EnumType.STRING)
     private Role role;
     private boolean enabled;
     @Enumerated(EnumType.STRING)

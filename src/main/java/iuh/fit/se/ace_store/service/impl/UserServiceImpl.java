@@ -1,7 +1,10 @@
 package iuh.fit.se.ace_store.service.impl;
 
+import iuh.fit.se.ace_store.dto.ChangePasswordDTO;
+import iuh.fit.se.ace_store.dto.UserProfileDTO;
 import iuh.fit.se.ace_store.dto.request.LoginRequest;
 import iuh.fit.se.ace_store.dto.request.RegisterRequest;
+import iuh.fit.se.ace_store.dto.response.ApiResponse;
 import iuh.fit.se.ace_store.dto.response.UserResponse;
 import iuh.fit.se.ace_store.entity.User;
 import iuh.fit.se.ace_store.entity.enums.AuthProvider;
@@ -79,6 +82,51 @@ public class UserServiceImpl implements UserService {
         }
 
         return toResponse(user);
+    }
+
+    @Override
+    public ApiResponse updateUserProfile(String email, UserProfileDTO dto) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setPhone(dto.getPhone());
+        user.setDob(dto.getDob());
+        user.setGender(dto.getGender());
+        user.setAddress(dto.getAddress());
+
+        userRepository.save(user);
+        return ApiResponse.success("Cập nhật thông tin thành công!", user);
+    }
+
+    @Override
+    public ApiResponse changePassword(String email, ChangePasswordDTO dto) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            return ApiResponse.error("Mật khẩu cũ không đúng!");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+        return ApiResponse.success("Đổi mật khẩu thành công!");
+    }
+
+    @Override
+    public ApiResponse updateUserRole(Long userId, String roleName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user ID: " + userId));
+
+        try {
+            Role newRole = Role.valueOf(roleName.toUpperCase());
+            user.setRole(newRole);
+            userRepository.save(user);
+            return ApiResponse.success("Cập nhật quyền thành công!", user);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.error("Role không hợp lệ!");
+        }
     }
 
     private UserResponse toResponse(User user) {

@@ -1,6 +1,7 @@
 package iuh.fit.se.ace_store.dto.response;
 
 public class ApiResponse {
+
     private boolean success;
     private String errorCode;
     private String message;
@@ -13,6 +14,21 @@ public class ApiResponse {
         this.message = message;
         this.action = action;
         this.data = data;
+    }
+    public static ApiResponse success(String message) {
+        return new ApiResponse(true, null, message, null, null);
+    }
+
+    public static ApiResponse success(String message, Object data) {
+        return new ApiResponse(true, null, message, null, data);
+    }
+
+    public static ApiResponse error(String message) {
+        return new ApiResponse(false, null, message, null, null);
+    }
+
+    public static ApiResponse error(String message, String errorCode) {
+        return new ApiResponse(false, errorCode, message, null, null);
     }
 
     public boolean isSuccess() {
