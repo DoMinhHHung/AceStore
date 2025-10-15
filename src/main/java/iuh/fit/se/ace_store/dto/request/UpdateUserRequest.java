@@ -1,4 +1,4 @@
-package iuh.fit.se.ace_store.dto;
+package iuh.fit.se.ace_store.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserProfileDTO {
+public class UpdateUserRequest {
     private String firstName;
     private String lastName;
     private String phone;

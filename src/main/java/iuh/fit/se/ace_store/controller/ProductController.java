@@ -1,7 +1,7 @@
 
 package iuh.fit.se.ace_store.controller;
 
-import iuh.fit.se.ace_store.dto.ProductSearchDTO;
+import iuh.fit.se.ace_store.dto.request.ProductSearchDTORequest;
 import iuh.fit.se.ace_store.dto.ProductDTO;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
 import iuh.fit.se.ace_store.service.ProductService;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -20,7 +19,7 @@ import java.util.List;
 public class ProductController {
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse> searchProducts(@RequestBody ProductSearchDTO searchDTO) {
+    public ResponseEntity<ApiResponse> searchProducts(@RequestBody ProductSearchDTORequest searchDTO) {
         try {
             List<ProductDTO> result = productService.searchProducts(searchDTO);
             return ResponseEntity.ok(new ApiResponse(true, null, "Tìm kiếm sản phẩm thành công!", null, result));

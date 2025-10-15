@@ -1,4 +1,4 @@
-package iuh.fit.se.ace_store.dto;
+package iuh.fit.se.ace_store.dto.request;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChangePasswordDTO {
+public class ChangePasswordRequest {
     private String oldPassword;
     private String newPassword;
 }

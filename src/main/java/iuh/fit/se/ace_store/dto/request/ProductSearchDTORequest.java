@@ -1,9 +1,9 @@
-package iuh.fit.se.ace_store.dto;
+package iuh.fit.se.ace_store.dto.request;
 
 import lombok.Data;
 
 @Data
-public class ProductSearchDTO {
+public class ProductSearchDTORequest {
     private String keyword;      // Từ khóa tìm kiếm
     private String category;     // Loại sản phẩm
     private Double minPrice;     // Giá tối thiểu

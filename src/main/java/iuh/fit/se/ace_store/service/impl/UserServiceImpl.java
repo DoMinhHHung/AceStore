@@ -1,7 +1,7 @@
 package iuh.fit.se.ace_store.service.impl;
 
-import iuh.fit.se.ace_store.dto.ChangePasswordDTO;
-import iuh.fit.se.ace_store.dto.UserProfileDTO;
+import iuh.fit.se.ace_store.dto.request.ChangePasswordRequest;
+import iuh.fit.se.ace_store.dto.request.UpdateUserRequest;
 import iuh.fit.se.ace_store.dto.request.LoginRequest;
 import iuh.fit.se.ace_store.dto.request.RegisterRequest;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
@@ -13,6 +13,8 @@ import iuh.fit.se.ace_store.repository.UserRepository;
 import iuh.fit.se.ace_store.service.EmailService;
 import iuh.fit.se.ace_store.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
@@ -88,7 +90,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse updateUserProfile(String email, UserProfileDTO dto) {
+    public ApiResponse updateUserProfile(String email, UpdateUserRequest dto) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
 
@@ -104,7 +106,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse changePassword(String email, ChangePasswordDTO dto) {
+    public ApiResponse changePassword(String email, ChangePasswordRequest dto) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
 
@@ -130,6 +132,18 @@ public class UserServiceImpl implements UserService {
         } catch (IllegalArgumentException e) {
             return ApiResponse.error("Role không hợp lệ!");
         }
+    }
+
+    @Override
+    public ApiResponse getCurrentUser() {
+    User user = getAuthenticatedUser();
+    return ApiResponse.success("Lấy thông tin user thành công!", toResponse(user));
+    }
+
+    private User getAuthenticatedUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     private UserResponse toResponse(User user) {
