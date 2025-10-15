@@ -15,6 +15,7 @@ import iuh.fit.se.ace_store.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,6 +23,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    @Value("${ace.verify-link}")
+    private String verifyLinkProperty;
 
     private final UserRepository userRepository;
     private final EmailService emailService;
@@ -53,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        String verifyLink = "http://localhost:8080/api/auth/verify?token=" + token;
+    String verifyLink = verifyLinkProperty + token;
 
         String html = """
             <h3>Xin chào %s,</h3>

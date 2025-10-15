@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy user: " + username));
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail()) // lấy email làm username chính
+                .withUsername(user.getEmail())
                 .password(user.getPassword())
                 .authorities("ROLE_" + user.getRole().name())
                 .accountExpired(false)

@@ -28,7 +28,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(htmlContent, true);
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("Lỗi gửi email rồi bro 😅: " + e.getMessage());
+            throw new RuntimeException("Lỗi gửi email: " + e.getMessage());
         }
     }
 }

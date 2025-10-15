@@ -1,5 +1,7 @@
 package iuh.fit.se.ace_store.controller;
 
+import iuh.fit.se.ace_store.dto.ChangePasswordDTO;
+import iuh.fit.se.ace_store.dto.UserProfileDTO;
 import iuh.fit.se.ace_store.dto.request.LoginRequest;
 import iuh.fit.se.ace_store.dto.request.RegisterRequest;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
@@ -9,6 +11,7 @@ import iuh.fit.se.ace_store.entity.User;
 import iuh.fit.se.ace_store.repository.UserRepository;
 import iuh.fit.se.ace_store.service.EmailService;
 import iuh.fit.se.ace_store.service.JwtService;
+import iuh.fit.se.ace_store.service.PasswordResetService;
 import iuh.fit.se.ace_store.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +19,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/ace/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -31,6 +35,7 @@ public class AuthController {
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> register(@RequestBody RegisterRequest request) {
@@ -89,5 +94,30 @@ public class AuthController {
     @GetMapping("/success")
     public ResponseEntity<ApiResponse> loginSuccess() {
         return ResponseEntity.ok(new ApiResponse(true, null, "Google login successful!", null, null));
+    }
+    @PutMapping("/user/profile")
+    public ResponseEntity<ApiResponse> updateUserProfile(@RequestBody UserProfileDTO dto, @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        ApiResponse response = userService.updateUserProfile(email, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/user/change-password")
+    public ResponseEntity<ApiResponse> changePassword(@RequestBody ChangePasswordDTO dto, @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        ApiResponse response = userService.changePassword(email, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse> forgotPassword(@RequestParam String email) {
+        return ResponseEntity.ok(passwordResetService.forgotPassword(email));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse> resetPassword(
+            @RequestParam String token,
+            @RequestParam String newPassword) {
+        return ResponseEntity.ok(passwordResetService.resetPassword(token, newPassword));
     }
 }

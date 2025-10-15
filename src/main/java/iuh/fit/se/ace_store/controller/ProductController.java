@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/ace/products")
 @RequiredArgsConstructor
 @CrossOrigin("*")
 public class ProductController {
