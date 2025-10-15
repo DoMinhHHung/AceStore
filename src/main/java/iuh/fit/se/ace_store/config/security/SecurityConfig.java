@@ -47,37 +47,38 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/**",          // login, register, forgot/reset password
-                                "/oauth2/**",            // google oauth2
-                                "/login", "/error",
-                                "/auth/success"
-                        ).permitAll()
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(AbstractHttpConfigurer::disable)
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(
+                "/ace/auth/**",          // login, register, forgot/reset password
+                "/oauth2/**",            // google oauth2
+                "/login", "/error",
+                "/auth/success",
+                "/swagger-ui/**", "/v3/api-docs/**"
+            ).permitAll()
 
-                        // Admin endpoints
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            // Admin endpoints
+            .requestMatchers("/ace/admin/**").hasRole("ADMIN")
 
-                        //  User endpoints
-                        .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+            //  User endpoints
+            .requestMatchers("/ace/user/**").hasAnyRole("USER", "ADMIN")
 
-                        //  Public products (ai cũng xem được)
-                        .requestMatchers("/api/products/**").permitAll()
+            //  Public products (ai cũng xem được)
+            .requestMatchers("/ace/products/**").permitAll()
 
-                        // Còn lại phải có token mới vào
-                        .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth -> oauth
-                        .successHandler(oAuth2SuccessHandler)
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint()));
+            // Còn lại phải có token mới vào
+            .anyRequest().authenticated()
+        )
+        .oauth2Login(oauth -> oauth
+            .successHandler(oAuth2SuccessHandler)
+        )
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint()));
 
-        return http.build();
+    return http.build();
     }
 
     /**
