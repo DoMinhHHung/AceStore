@@ -1,5 +1,7 @@
+
 package iuh.fit.se.ace_store.controller;
 
+import iuh.fit.se.ace_store.dto.ProductSearchDTO;
 import iuh.fit.se.ace_store.dto.ProductDTO;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
 import iuh.fit.se.ace_store.service.ProductService;
@@ -16,6 +18,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin("*")
 public class ProductController {
+
+    @PostMapping("/search")
+    public ResponseEntity<ApiResponse> searchProducts(@RequestBody ProductSearchDTO searchDTO) {
+        try {
+            List<ProductDTO> result = productService.searchProducts(searchDTO);
+            return ResponseEntity.ok(new ApiResponse(true, null, "Tìm kiếm sản phẩm thành công!", null, result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "PRODUCT_SEARCH_ERROR", e.getMessage(), null, null));
+        }
+    }
     private final ProductService productService;
 
     @PostMapping(consumes = {"multipart/form-data"})

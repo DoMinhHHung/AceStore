@@ -1,4 +1,5 @@
 ## 1. Cấu hình file application.properties
+
 - Sử dụng file 'applicationExample.properties' đổi thành 'application.properties' và thay thế các value trong đó
 
 ## 2. Hướng dẫn test API với Postman
@@ -89,7 +90,29 @@
   - URL: `{{base-url}}/ace/admin/role?userId=1&roleName=ADMIN`
   - Header: `Authorization: Bearer <admin-token>`
 
-## 2. Test API với Swagger
+### 2.5. Test API lọc/tìm kiếm sản phẩm
+
+- **Tìm kiếm sản phẩm nâng cao**
+  - Method: POST
+  - URL: `{{base-url}}/ace/products/search`
+  - Body (JSON):
+
+```json
+{
+  "keyword": "laptop",
+  "category": "Gaming",
+  "minPrice": 10000000,
+  "maxPrice": 30000000,
+  "page": 0,
+  "size": 10,
+  "sortBy": "price",
+  "sortDir": "asc"
+}
+```
+
+- Kết quả trả về là danh sách sản phẩm phù hợp với điều kiện lọc, có thể phân trang và sắp xếp.
+
+## 3. Test API với Swagger
 
 - Truy cập Swagger để xem chi tiết các API:
   - `http://localhost:8080/swagger-ui/index.html`

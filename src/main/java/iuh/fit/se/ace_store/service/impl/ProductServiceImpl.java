@@ -15,6 +15,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
+    @Override
+    public List<ProductDTO> searchProducts(iuh.fit.se.ace_store.dto.ProductSearchDTO searchDTO) {
+        return productRepository.findAll().stream()
+                .filter(p -> searchDTO.getKeyword() == null || p.getName().toLowerCase().contains(searchDTO.getKeyword().toLowerCase()))
+                .filter(p -> searchDTO.getCategory() == null || p.getCategory().equalsIgnoreCase(searchDTO.getCategory()))
+                .filter(p -> searchDTO.getMinPrice() == null || p.getPrice() >= searchDTO.getMinPrice())
+                .filter(p -> searchDTO.getMaxPrice() == null || p.getPrice() <= searchDTO.getMaxPrice())
+                .map(this::toDTO)
+                .toList();
+    }
     private final ProductRepository productRepository;
     private final CloudinaryService cloudinaryService;
 
