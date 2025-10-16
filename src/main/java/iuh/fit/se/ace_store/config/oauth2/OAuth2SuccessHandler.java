@@ -5,8 +5,7 @@ import iuh.fit.se.ace_store.entity.User;
 import iuh.fit.se.ace_store.entity.enums.AuthProvider;
 import iuh.fit.se.ace_store.entity.enums.Role;
 import iuh.fit.se.ace_store.repository.UserRepository;
-import iuh.fit.se.ace_store.service.EmailService;
-import iuh.fit.se.ace_store.service.JwtService;
+import iuh.fit.se.ace_store.service.AuthService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,8 +26,8 @@ import java.util.Optional;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
-    private final EmailService emailService;
-    private final JwtService jwtService;
+    private final AuthService.EmailService emailService;
+    private final AuthService.JwtService jwtService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

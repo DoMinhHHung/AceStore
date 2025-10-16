@@ -4,7 +4,7 @@ import iuh.fit.se.ace_store.entity.User;
 import iuh.fit.se.ace_store.entity.enums.AuthProvider;
 import iuh.fit.se.ace_store.entity.enums.Role;
 import iuh.fit.se.ace_store.repository.UserRepository;
-import iuh.fit.se.ace_store.service.EmailService;
+import iuh.fit.se.ace_store.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -12,7 +12,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -20,7 +19,7 @@ import java.util.Optional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
-    private final EmailService emailService;
+    private final AuthService.EmailService emailService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {

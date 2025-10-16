@@ -1,18 +1,12 @@
 package iuh.fit.se.ace_store.controller;
 
-import iuh.fit.se.ace_store.dto.request.ChangePasswordRequest;
-import iuh.fit.se.ace_store.dto.request.UpdateUserRequest;
-import iuh.fit.se.ace_store.dto.request.LoginRequest;
-import iuh.fit.se.ace_store.dto.request.RegisterRequest;
+import iuh.fit.se.ace_store.dto.request.*;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
-import iuh.fit.se.ace_store.dto.response.AuthResponseDTO;
+import iuh.fit.se.ace_store.dto.response.AuthResponse;
 import iuh.fit.se.ace_store.dto.response.UserResponse;
 import iuh.fit.se.ace_store.entity.User;
 import iuh.fit.se.ace_store.repository.UserRepository;
-import iuh.fit.se.ace_store.service.EmailService;
-import iuh.fit.se.ace_store.service.JwtService;
-import iuh.fit.se.ace_store.service.PasswordResetService;
-import iuh.fit.se.ace_store.service.UserService;
+import iuh.fit.se.ace_store.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +26,13 @@ public class AuthController {
 
     private final UserService userService;
     private final UserRepository userRepository;
-    private final EmailService emailService;
+    private final AuthService.EmailService emailService;
     private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final PasswordResetService passwordResetService;
+    private final AuthService.JwtService jwtService;
+    private final AuthService.PasswordResetService passwordResetService;
 
     @PostMapping("/auth/register")
-    public ResponseEntity<ApiResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse> register(@RequestBody AuthRequest.RegisterRequest request) {
         try {
             UserResponse response = userService.register(request);
             return ResponseEntity.ok(new ApiResponse(true, null, "Đăng ký thành công! Vui lòng kiểm tra email để xác thực.", null, response));
@@ -48,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse> login(@Valid @RequestBody AuthRequest.LoginRequest request) {
     try {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
@@ -59,7 +53,7 @@ public class AuthController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String accessToken = jwtService.generateToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
-        AuthResponseDTO response = new AuthResponseDTO(accessToken, refreshToken, "Bearer");
+        AuthResponse response = new AuthResponse(accessToken, refreshToken, "Bearer");
         return ResponseEntity.ok(new ApiResponse(true, null, "Đăng nhập thành công!", null, response));
     } catch (RuntimeException e) {
         String action = e.getMessage().contains("activated") ? "Vui lòng kiểm tra email để xác thực tài khoản." : null;
@@ -96,14 +90,14 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse(true, null, "Google login successful!", null, null));
     }
     @PutMapping("/user/profile")
-    public ResponseEntity<ApiResponse> updateUserProfile(@RequestBody UpdateUserRequest dto, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ApiResponse> updateUserProfile(@RequestBody AuthRequest.UpdateUserRequest dto, @AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
         ApiResponse response = userService.updateUserProfile(email, dto);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/user/change-password")
-    public ResponseEntity<ApiResponse> changePassword(@RequestBody ChangePasswordRequest dto, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ApiResponse> changePassword(@RequestBody AuthRequest.ChangePasswordRequest dto, @AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
         ApiResponse response = userService.changePassword(email, dto);
         return ResponseEntity.ok(response);

@@ -2,7 +2,7 @@ package iuh.fit.se.ace_store.service.impl;
 
 import iuh.fit.se.ace_store.config.cloudinary.CloudinaryService;
 import iuh.fit.se.ace_store.dto.ProductDTO;
-import iuh.fit.se.ace_store.dto.request.ProductSearchDTORequest;
+import iuh.fit.se.ace_store.dto.request.ProductSearchRequest;
 import iuh.fit.se.ace_store.entity.Product;
 import iuh.fit.se.ace_store.repository.ProductRepository;
 import iuh.fit.se.ace_store.service.ProductService;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     @Override
-    public List<ProductDTO> searchProducts(ProductSearchDTORequest searchDTO) {
+    public List<ProductDTO> searchProducts(ProductSearchRequest searchDTO) {
         return productRepository.findAll().stream()
                 .filter(p -> searchDTO.getKeyword() == null || p.getName().toLowerCase().contains(searchDTO.getKeyword().toLowerCase()))
                 .filter(p -> searchDTO.getCategory() == null || p.getCategory().equalsIgnoreCase(searchDTO.getCategory()))

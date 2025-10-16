@@ -1,6 +1,6 @@
 package iuh.fit.se.ace_store.controller;
 
-import iuh.fit.se.ace_store.dto.request.AddToCartRequest;
+import iuh.fit.se.ace_store.dto.request.CartRequest;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
 import iuh.fit.se.ace_store.service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/{userId}/add")
-    public ApiResponse addToCart(@PathVariable Long userId, @RequestBody AddToCartRequest request) {
+    public ApiResponse addToCart(@PathVariable Long userId, @RequestBody CartRequest request) {
         return cartService.addToCart(userId, request);
     }
 

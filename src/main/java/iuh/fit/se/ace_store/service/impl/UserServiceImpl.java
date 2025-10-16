@@ -1,16 +1,13 @@
 package iuh.fit.se.ace_store.service.impl;
 
-import iuh.fit.se.ace_store.dto.request.ChangePasswordRequest;
-import iuh.fit.se.ace_store.dto.request.UpdateUserRequest;
-import iuh.fit.se.ace_store.dto.request.LoginRequest;
-import iuh.fit.se.ace_store.dto.request.RegisterRequest;
+import iuh.fit.se.ace_store.dto.request.*;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
 import iuh.fit.se.ace_store.dto.response.UserResponse;
 import iuh.fit.se.ace_store.entity.User;
 import iuh.fit.se.ace_store.entity.enums.AuthProvider;
 import iuh.fit.se.ace_store.entity.enums.Role;
 import iuh.fit.se.ace_store.repository.UserRepository;
-import iuh.fit.se.ace_store.service.EmailService;
+import iuh.fit.se.ace_store.service.AuthService;
 import iuh.fit.se.ace_store.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,11 +26,11 @@ public class UserServiceImpl implements UserService {
     private String verifyLinkProperty;
 
     private final UserRepository userRepository;
-    private final EmailService emailService;
+    private final AuthService.EmailService emailService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
-    public UserResponse register(RegisterRequest request) {
+    public UserResponse register(AuthRequest.RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail()) || userRepository.existsByPhone(request.getPhone())) {
             throw new RuntimeException("Email or Phone is already exists!!!");
         }
@@ -73,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse login(LoginRequest request) {
+    public UserResponse login(AuthRequest.LoginRequest request) {
         User user = userRepository.findByEmail(request.getUsername())
                 .or(() -> userRepository.findByPhone(request.getUsername()))
                 .orElseThrow(() -> new RuntimeException("Account not exists!!!"));
@@ -90,7 +87,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse updateUserProfile(String email, UpdateUserRequest dto) {
+    public ApiResponse updateUserProfile(String email, AuthRequest.UpdateUserRequest dto) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
 
@@ -106,7 +103,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse changePassword(String email, ChangePasswordRequest dto) {
+    public ApiResponse changePassword(String email, AuthRequest.ChangePasswordRequest dto) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
 

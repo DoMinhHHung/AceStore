@@ -1,6 +1,6 @@
 package iuh.fit.se.ace_store.config.security;
 
-import iuh.fit.se.ace_store.service.JwtService;
+import iuh.fit.se.ace_store.service.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthentication extends OncePerRequestFilter {
-    private final JwtService jwtService;
+    private final AuthService.JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
 

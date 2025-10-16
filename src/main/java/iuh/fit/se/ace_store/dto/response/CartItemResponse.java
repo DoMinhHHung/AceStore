@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CartItemResponse {
+public class   CartItemResponse {
     private Long productId;
     private String productName;
     private String imageUrl;

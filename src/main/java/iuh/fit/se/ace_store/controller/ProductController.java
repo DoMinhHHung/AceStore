@@ -1,7 +1,7 @@
 
 package iuh.fit.se.ace_store.controller;
 
-import iuh.fit.se.ace_store.dto.request.ProductSearchDTORequest;
+import iuh.fit.se.ace_store.dto.request.ProductSearchRequest;
 import iuh.fit.se.ace_store.dto.ProductDTO;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
 import iuh.fit.se.ace_store.service.ProductService;
@@ -19,7 +19,7 @@ import java.util.List;
 public class ProductController {
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse> searchProducts(@RequestBody ProductSearchDTORequest searchDTO) {
+    public ResponseEntity<ApiResponse> searchProducts(@RequestBody ProductSearchRequest searchDTO) {
         try {
             List<ProductDTO> result = productService.searchProducts(searchDTO);
             return ResponseEntity.ok(new ApiResponse(true, null, "Tìm kiếm sản phẩm thành công!", null, result));

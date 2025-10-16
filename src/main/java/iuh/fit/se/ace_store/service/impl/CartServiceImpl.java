@@ -1,6 +1,6 @@
 package iuh.fit.se.ace_store.service.impl;
 
-import iuh.fit.se.ace_store.dto.request.AddToCartRequest;
+import iuh.fit.se.ace_store.dto.request.CartRequest;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
 import iuh.fit.se.ace_store.entity.Cart;
 import iuh.fit.se.ace_store.entity.CartItem;
@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import iuh.fit.se.ace_store.mapper.CartMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
@@ -28,7 +26,7 @@ public class CartServiceImpl implements CartService {
 
 
     @Override
-    public ApiResponse addToCart(Long userId, AddToCartRequest request) {
+    public ApiResponse addToCart(Long userId, CartRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

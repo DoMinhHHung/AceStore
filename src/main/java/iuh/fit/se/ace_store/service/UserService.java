@@ -1,17 +1,14 @@
 package iuh.fit.se.ace_store.service;
 
-import iuh.fit.se.ace_store.dto.request.ChangePasswordRequest;
-import iuh.fit.se.ace_store.dto.request.UpdateUserRequest;
-import iuh.fit.se.ace_store.dto.request.LoginRequest;
-import iuh.fit.se.ace_store.dto.request.RegisterRequest;
+import iuh.fit.se.ace_store.dto.request.*;
 import iuh.fit.se.ace_store.dto.response.ApiResponse;
 import iuh.fit.se.ace_store.dto.response.UserResponse;
 
 public interface UserService {
-    UserResponse register(RegisterRequest request);
-    UserResponse login(LoginRequest request);
-    ApiResponse updateUserProfile(String email, UpdateUserRequest dto);
-    ApiResponse changePassword(String email, ChangePasswordRequest dto);
+    UserResponse register(AuthRequest.RegisterRequest request);
+    UserResponse login(AuthRequest.LoginRequest request);
+    ApiResponse updateUserProfile(String email, AuthRequest.UpdateUserRequest dto);
+    ApiResponse changePassword(String email, AuthRequest.ChangePasswordRequest dto);
     ApiResponse updateUserRole(Long userId, String roleName);
     ApiResponse getCurrentUser();
 
