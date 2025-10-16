@@ -73,29 +73,23 @@
 
 ### 2.4. Test API admin
 
-- **Lấy danh sách user**
+- Method: GET
+- URL: `{{base-url}}/ace/admin/users`
+- Header: `Authorization: Bearer <admin-token>`
 
-  - Method: GET
-  - URL: `{{base-url}}/ace/admin/users`
-  - Header: `Authorization: Bearer <admin-token>`
+- Method: PUT
+- URL: `{{base-url}}/ace/admin/users/{id}/disable`
+- Header: `Authorization: Bearer <admin-token>`
 
-- **Vô hiệu hóa user**
-
-  - Method: PUT
-  - URL: `{{base-url}}/ace/admin/users/{id}/disable`
-  - Header: `Authorization: Bearer <admin-token>`
-
-- **Cập nhật quyền user**
-  - Method: PUT
-  - URL: `{{base-url}}/ace/admin/role?userId=1&roleName=ADMIN`
-  - Header: `Authorization: Bearer <admin-token>`
+- Method: PUT
+- URL: `{{base-url}}/ace/admin/role?userId=1&roleName=ADMIN`
+- Header: `Authorization: Bearer <admin-token>`
 
 ### 2.5. Test API lọc/tìm kiếm sản phẩm
 
-- **Tìm kiếm sản phẩm nâng cao**
-  - Method: POST
-  - URL: `{{base-url}}/ace/products/search`
-  - Body (JSON):
+- Method: POST
+- URL: `{{base-url}}/ace/products/search`
+- Body (JSON):
 
 ```json
 {
@@ -110,10 +104,41 @@
 }
 ```
 
-- Kết quả trả về là danh sách sản phẩm phù hợp với điều kiện lọc, có thể phân trang và sắp xếp.
+## 2.6. Test API Cart (Giỏ hàng)
+
+- **Thêm sản phẩm vào giỏ (Add to cart)**
+  - Method: POST
+  - URL: `{{base-url}}/ace/cart/{userId}/add`
+  - Body (JSON):
+
+```json
+{
+  "productId": 1,
+  "quantity": 2
+}
+```
+
+- **Lấy giỏ hàng của user**
+
+  - Method: GET
+  - URL: `{{base-url}}/ace/cart/{userId}`
+
+- **Cập nhật số lượng item**
+
+  - Method: PUT
+  - URL: `{{base-url}}/ace/cart/{userId}/update/{productId}?quantity=3`
+
+- **Xóa item khỏi giỏ**
+
+  - Method: DELETE
+  - URL: `{{base-url}}/ace/cart/{userId}/remove/{productId}`
+
+- **Xóa toàn bộ giỏ**
+  - Method: DELETE
+  - URL: `{{base-url}}/ace/cart/{userId}/clear`
+
+Lưu ý: Các endpoint cart hiện nhận `userId` trong path. Nếu hệ thống của bạn dùng JWT cho user, có thể thay đổi controller để lấy user từ token và loại bỏ `userId` khỏi path.
 
 ## 3. Test API với Swagger
 
-- Truy cập Swagger để xem chi tiết các API:
-  - `http://localhost:8080/swagger-ui/index.html`
-- Có thể test trực tiếp các API trên giao diện này.
+- `http://localhost:8080/swagger-ui/index.html`
