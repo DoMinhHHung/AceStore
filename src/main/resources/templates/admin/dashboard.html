@@ -1,0 +1,13 @@
+<h1>Admin - Dashboard</h1>
+<p>Users</p>
+<ul th:each="u : ${users}">
+  <li th:text="${u.email}">email</li>
+</ul>
+<p>Products</p>
+<ul th:each="p : ${products}">
+  <li th:text="${p.name}">name</li>
+</ul>
+<p>Orders</p>
+<ul th:each="o : ${orders}">
+  <li th:text="${o.orderCode}">code</li>
+</ul>

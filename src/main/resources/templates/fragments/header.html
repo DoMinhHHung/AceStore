@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <div th:fragment="header">
+    <header>
+      <nav>
+        <a th:href="@{/}">Ace Store</a> |
+        <a th:href="@{/products}">Sản phẩm</a> |
+        <a th:href="@{/cart}">Giỏ hàng</a> |
+        <a th:href="@{/addresses}">Địa chỉ</a>
+        <span style="float: right;">
+          <span th:if="${#authentication.principal != null}">
+            <a th:href="@{/profile}">Xin chào <span th:text="${#authentication.name}">User</span></a> |
+            <a th:href="@{/logout}">Đăng xuất</a>
+          </span>
+          <span th:if="${#authentication.principal == null}">
+            <a th:href="@{/login}">Đăng nhập</a> |
+            <a th:href="@{/register}">Đăng ký</a>
+          </span>
+        </span>
+      </nav>
+    </header>
+  </div>
+</html>

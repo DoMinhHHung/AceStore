@@ -1,0 +1,4 @@
+<h1>Quản lý Orders</h1>
+<ul th:each="o : ${orders}">
+  <li th:text="${o.orderCode}"></li>
+</ul>

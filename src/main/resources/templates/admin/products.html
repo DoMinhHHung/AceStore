@@ -1,0 +1,7 @@
+<h1>Quản lý Products</h1>
+<table>
+  <tr><th>ID</th><th>Tên</th><th>Giá</th></tr>
+  <tr th:each="p : ${products}">
+    <td th:text="${p.id}"></td><td th:text="${p.name}"></td><td th:text="${p.price}"></td>
+  </tr>
+</table>

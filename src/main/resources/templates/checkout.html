@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout">
+  <div th:fragment="content">
+    <h1>Thanh toán</h1>
+    <form th:action="@{/checkout}" method="post">
+      <label>Địa chỉ: <select name="addressId"><option value="">--Chọn--</option></select></label>
+      <label>Thanh toán:
+        <select name="paymentMethod">
+          <option value="COD">COD</option>
+          <option value="CARD">Online</option>
+        </select>
+      </label>
+      <button type="submit">Đặt hàng</button>
+    </form>
+  </div>
+</html>

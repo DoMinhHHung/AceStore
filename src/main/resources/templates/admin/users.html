@@ -1,0 +1,11 @@
+<h1>Quản lý Users</h1>
+<table>
+  <tr><th>ID</th><th>Email</th><th>Hành động</th></tr>
+  <tr th:each="u : ${users}">
+    <td th:text="${u.id}"></td>
+    <td th:text="${u.email}"></td>
+    <td>
+      <!-- Nút disable/enable gọi API admin hiện có -->
+    </td>
+  </tr>
+</table>

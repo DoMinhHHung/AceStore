@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout">
+  <div th:fragment="content">
+    <div th:if="${product != null}">
+      <h2 th:text="${product.name}">Product</h2>
+      <img th:src="${product.mainImage}" width="300" />
+      <p th:text="${product.description}">Descr</p>
+      <p>Giá: <span th:text="${product.price}">0</span></p>
+      <form th:action="@{/cart/add}" method="post">
+        <input type="hidden" name="productId" th:value="${product.id}" />
+        <input type="number" name="quantity" value="1" min="1"/>
+        <button type="submit">Thêm vào giỏ</button>
+      </form>
+    </div>
+  </div>
+</html>

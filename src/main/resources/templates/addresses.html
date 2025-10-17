@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout">
+  <div th:fragment="content">
+    <h1>Địa chỉ</h1>
+    <div th:if="${addressesResp != null}">
+      <div th:text="${addressesResp.message}"></div>
+      <ul>
+        <li th:each="a : ${addressesResp.data}">
+          <span th:text="${a.recipientName}">Tên</span> - <span th:text="${a.fullAddress}">địa chỉ</span>
+          <form th:action="@{'/addresses/' + ${a.id} + '/delete'}" method="post" style="display:inline">
+            <button type="submit">Xóa</button>
+          </form>
+          <form th:action="@{'/addresses/' + ${a.id} + '/default'}" method="post" style="display:inline">
+            <button type="submit">Đặt mặc định</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+
+    <h3>Thêm địa chỉ mới</h3>
+    <form th:action="@{/addresses/add}" method="post">
+      <input type="text" name="recipientName" placeholder="Tên người nhận" required />
+      <input type="text" name="phone" placeholder="SĐT" required />
+      <input type="text" name="province" placeholder="Tỉnh/TP" required />
+      <input type="text" name="district" placeholder="Quận/Huyện" required />
+      <input type="text" name="ward" placeholder="Phường/Xã" />
+      <input type="text" name="detail" placeholder="Địa chỉ chi tiết" />
+      <label><input type="checkbox" name="default"/> Mặc định</label>
+      <button type="submit">Lưu</button>
+    </form>
+  </div>
+</html>
