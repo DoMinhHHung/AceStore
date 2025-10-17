@@ -3,6 +3,8 @@ package iuh.fit.se.ace_store.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -15,7 +17,7 @@ public class OrderItem {
     private Long id;
 
     private int quantity;
-    private double price;
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

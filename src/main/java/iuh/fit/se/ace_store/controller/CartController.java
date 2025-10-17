@@ -13,31 +13,36 @@ public class CartController {
 
     private final CartService cartService;
 
-    @PostMapping("/{userId}/add")
-    public ApiResponse addToCart(@PathVariable Long userId, @RequestBody CartRequest request) {
-        return cartService.addToCart(userId, request);
+    @PostMapping("/add")
+    public ApiResponse addToCart(java.security.Principal principal, @RequestBody CartRequest request) {
+        String email = principal.getName();
+        return cartService.addToCart(email, request);
     }
 
-    @GetMapping("/{userId}")
-    public ApiResponse getCart(@PathVariable Long userId) {
-        return cartService.getCart(userId);
+    @GetMapping
+    public ApiResponse getCart(java.security.Principal principal) {
+        String email = principal.getName();
+        return cartService.getCart(email);
     }
 
-    @PutMapping("/{userId}/update/{productId}")
-    public ApiResponse updateCartItem(@PathVariable Long userId,
+    @PutMapping("/update/{productId}")
+    public ApiResponse updateCartItem(java.security.Principal principal,
                                       @PathVariable Long productId,
                                       @RequestParam int quantity) {
-        return cartService.updateCartItem(userId, productId, quantity);
+        String email = principal.getName();
+        return cartService.updateCartItem(email, productId, quantity);
     }
 
-    @DeleteMapping("/{userId}/remove/{productId}")
-    public ApiResponse removeCartItem(@PathVariable Long userId,
+    @DeleteMapping("/remove/{productId}")
+    public ApiResponse removeCartItem(java.security.Principal principal,
                                       @PathVariable Long productId) {
-        return cartService.removeCartItem(userId, productId);
+        String email = principal.getName();
+        return cartService.removeCartItem(email, productId);
     }
 
-    @DeleteMapping("/{userId}/clear")
-    public ApiResponse clearCart(@PathVariable Long userId) {
-        return cartService.clearCart(userId);
+    @DeleteMapping("/clear")
+    public ApiResponse clearCart(java.security.Principal principal) {
+        String email = principal.getName();
+        return cartService.clearCart(email);
     }
 }

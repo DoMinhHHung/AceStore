@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class OrderRequest {
-    private boolean isPickup;
+    private boolean pickup;
     private Long addressId;
     private PaymentMethod  paymentMethod;
 }

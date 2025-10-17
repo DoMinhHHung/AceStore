@@ -22,7 +22,7 @@ public class Address {
     private String detail;
     private boolean isDefault;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 }

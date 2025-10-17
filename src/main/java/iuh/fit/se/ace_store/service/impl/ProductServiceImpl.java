@@ -21,8 +21,8 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll().stream()
                 .filter(p -> searchDTO.getKeyword() == null || p.getName().toLowerCase().contains(searchDTO.getKeyword().toLowerCase()))
                 .filter(p -> searchDTO.getCategory() == null || p.getCategory().equalsIgnoreCase(searchDTO.getCategory()))
-                .filter(p -> searchDTO.getMinPrice() == null || p.getPrice() >= searchDTO.getMinPrice())
-                .filter(p -> searchDTO.getMaxPrice() == null || p.getPrice() <= searchDTO.getMaxPrice())
+                .filter(p -> searchDTO.getMinPrice() == null || p.getPrice().compareTo(searchDTO.getMinPrice()) >= 0)
+                .filter(p -> searchDTO.getMaxPrice() == null || p.getPrice().compareTo(searchDTO.getMaxPrice()) <= 0)
                 .map(this::toDTO)
                 .toList();
     }

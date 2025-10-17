@@ -1,92 +1,74 @@
-## 1. Cấu hình file application.properties
+## 1. Cấu hình
 
-- Sử dụng file 'applicationExample.properties' đổi thành 'application.properties' và thay thế các value trong đó
+- Sao chép `applicationExample.properties` thành `application.properties` và cập nhật các giá trị (DB, cloudinary, jwt...).
 
-## 2. Hướng dẫn test API với Postman
+BASE URL (local):
 
-    {{base-url}} = http://locahost:8080
+```
+{{base-url}} = http://localhost:8080
+```
 
-### 2.1. Đăng nhập và lấy token
+---
 
-- Gửi POST tới: `{{base-url}}/ace/auth/login`
+## 2. Authentication (Auth)
+
+### 2.1. Đăng ký (Register)
+- Method: POST
+- URL: `{{base-url}}/ace/auth/register`
 - Body (JSON):
 
 ```json
 {
-  "username": "your_email_or_phone",
-  "password": "your_password"
+  "email": "user@example.com",
+  "password": "P@ssw0rd",
+  "firstName": "John",
+  "lastName": "Doe"
 }
 ```
 
-- Lấy token từ response để sử dụng cho các API cần xác thực.
-
-### 2.2. Test API sản phẩm
-
-- **Tạo sản phẩm**
-
-  - Method: POST
-  - URL: `{{base-url}}/ace/products`
-  - Body: `form-data` (có thể upload ảnh)
-    - Trường: name, price, description, images (chọn file ảnh)
-
-- **Cập nhật sản phẩm**
-
-  - Method: PUT
-  - URL: `{{base-url}}/ace/products/{id}`
-  - Body: `form-data` (có thể upload ảnh mới)
-
-- **Lấy danh sách sản phẩm**
-  - Method: GET
-  - URL: `{{base-url}}/ace/products`
-
-### 2.3. Test API user
-
-- **Cập nhật thông tin cá nhân**
-  - Method: PUT
-  - URL: `{{base-url}}/ace/user/profile`
-  - Header: `Authorization: Bearer <token>`
-  - Body (JSON):
+### 2.2. Đăng nhập (Login)
+- Method: POST
+- URL: `{{base-url}}/ace/auth/login`
+- Body (JSON):
 
 ```json
 {
-  "firstName": "Test",
-  "lastName": "User",
-  "phone": "0123456789",
-  "address": "Hanoi",
-  "gender": "male",
-  "dob": "2000-01-01"
+  "username": "user@example.com",
+  "password": "P@ssw0rd"
 }
 ```
 
-- **Đổi mật khẩu**
-  - Method: PUT
-  - URL: `{{base-url}}/ace/user/change-password`
-  - Header: `Authorization: Bearer <token>`
-  - Body (JSON):
+- Response: chứa access token (Bearer). Dùng header `Authorization: Bearer <token>` cho các API cần auth.
 
-```json
-{
-  "oldPassword": "yourOldPassword",
-  "newPassword": "yourNewPassword"
-}
-```
+### 2.3. Email verify / reset
+- Verify: `GET {{base-url}}/ace/auth/verify?token=...`
+- Forgot password: `POST {{base-url}}/ace/auth/forgot-password` (body contains email)
+- Reset password: `POST {{base-url}}/ace/auth/reset-password` (body contains token + newPassword)
 
-### 2.4. Test API admin
+---
 
+## 3. Products
+
+### Create product (admin)
+- Method: POST
+- URL: `{{base-url}}/ace/products`
+- Body: `form-data` (supports files)
+  - fields: `name` (string), `price` (number), `category`, `description`, `images` (file[])
+
+### Update product (admin)
+- Method: PUT
+- URL: `{{base-url}}/ace/products/{id}`
+- Body: `form-data` (same fields)
+
+### Get products
 - Method: GET
-- URL: `{{base-url}}/ace/admin/users`
-- Header: `Authorization: Bearer <admin-token>`
+- URL: `{{base-url}}/ace/products`
 
-- Method: PUT
-- URL: `{{base-url}}/ace/admin/users/{id}/disable`
-- Header: `Authorization: Bearer <admin-token>`
+### Get product by id
+- Method: GET
+- URL: `{{base-url}}/ace/products/{id}`
 
-- Method: PUT
-- URL: `{{base-url}}/ace/admin/role?userId=1&roleName=ADMIN`
-- Header: `Authorization: Bearer <admin-token>`
-
-### 2.5. Test API lọc/tìm kiếm sản phẩm
-
+### Search / filter products
 - Method: POST
 - URL: `{{base-url}}/ace/products/search`
 - Body (JSON):
@@ -104,12 +86,61 @@
 }
 ```
 
-## 2.6. Test API Cart (Giỏ hàng)
+Note: `price` fields use decimal values (BigDecimal in code). Provide numbers or decimals as appropriate.
 
-- **Thêm sản phẩm vào giỏ (Add to cart)**
-  - Method: POST
-  - URL: `{{base-url}}/ace/cart/{userId}/add`
-  - Body (JSON):
+---
+
+## 4. User APIs
+
+### Update profile
+- Method: PUT
+- URL: `{{base-url}}/ace/user/profile`
+- Header: `Authorization: Bearer <token>`
+- Body (JSON example):
+
+```json
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "phone": "0123456789",
+  "address": "Hanoi",
+  "gender": "male",
+  "dob": "2000-01-01"
+}
+```
+
+### Change password
+- Method: PUT
+- URL: `{{base-url}}/ace/user/change-password`
+- Header: `Authorization: Bearer <token>`
+- Body:
+
+```json
+{
+  "oldPassword": "old",
+  "newPassword": "new"
+}
+```
+
+---
+
+## 5. Admin APIs
+
+- List users: `GET {{base-url}}/ace/admin/users` (Requires ROLE_ADMIN)
+- Disable user: `PUT {{base-url}}/ace/admin/users/{id}/disable` (Requires ROLE_ADMIN)
+- Change role: `PUT {{base-url}}/ace/admin/role?userId=1&roleName=ADMIN` (Requires ROLE_ADMIN)
+
+---
+
+## 6. Cart (Giỏ hàng)
+
+> Cart endpoints now use the authenticated user (JWT) and do not accept a `userId` path parameter. Pass the Authorization header: `Authorization: Bearer <token>`.
+
+### Add to cart
+- Method: POST
+- URL: `{{base-url}}/ace/cart/add`
+- Header: `Authorization: Bearer <token>`
+- Body:
 
 ```json
 {
@@ -118,27 +149,87 @@
 }
 ```
 
-- **Lấy giỏ hàng của user**
+### Get cart
+- Method: GET
+- URL: `{{base-url}}/ace/cart`
+- Header: `Authorization: Bearer <token>`
 
-  - Method: GET
-  - URL: `{{base-url}}/ace/cart/{userId}`
+### Update cart item quantity
+- Method: PUT
+- URL: `{{base-url}}/ace/cart/update/{productId}?quantity=3`
+- Header: `Authorization: Bearer <token>`
 
-- **Cập nhật số lượng item**
+### Remove item
+- Method: DELETE
+- URL: `{{base-url}}/ace/cart/remove/{productId}`
+- Header: `Authorization: Bearer <token>`
 
-  - Method: PUT
-  - URL: `{{base-url}}/ace/cart/{userId}/update/{productId}?quantity=3`
+### Clear cart
+- Method: DELETE
+- URL: `{{base-url}}/ace/cart/clear`
+- Header: `Authorization: Bearer <token>`
 
-- **Xóa item khỏi giỏ**
+---
 
-  - Method: DELETE
-  - URL: `{{base-url}}/ace/cart/{userId}/remove/{productId}`
+## 7. Orders
 
-- **Xóa toàn bộ giỏ**
-  - Method: DELETE
-  - URL: `{{base-url}}/ace/cart/{userId}/clear`
+### Create order (checkout)
+- Method: POST
+- URL: `{{base-url}}/ace/orders`
+- Header: `Authorization: Bearer <token>`
+- Body (JSON):
 
-Lưu ý: Các endpoint cart hiện nhận `userId` trong path. Nếu hệ thống của bạn dùng JWT cho user, có thể thay đổi controller để lấy user từ token và loại bỏ `userId` khỏi path.
+```json
+{
+  "pickup": false,
+  "addressId": 1,
+  "paymentMethod": "COD"  // or BANKING, MOMO, ZALOPAY
+}
+```
 
-## 3. Test API với Swagger
+- Behavior (current implementation):
+  - The service reads the authenticated user's cart, validates stock, computes totals, decrements stock, stores order and items, then clears the cart.
+  - Order status is initially `PENDING`.
 
-- `http://localhost:8080/swagger-ui/index.html`
+### List user's orders
+- Method: GET
+- URL: `{{base-url}}/ace/orders`
+- Header: `Authorization: Bearer <token>`
+
+### Get order detail
+- Method: GET
+- URL: `{{base-url}}/ace/orders/{orderId}`
+- Header: `Authorization: Bearer <token>`
+
+### Admin: update order status
+- Method: PUT
+- URL: `{{base-url}}/ace/admin/orders/{orderId}/status`
+- Body: `{ "status": "SHIPPED" }` (Requires ROLE_ADMIN)
+
+Notes:
+- Current flow decrements stock at order creation. If you plan to integrate async payment gateways, consider switching to a reserve-and-confirm model.
+
+---
+
+## 8. Swagger UI
+
+- If you enabled Swagger (springdoc), visit:
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+---
+
+## 9. Quick local build & run
+
+Build (skip tests):
+
+```powershell
+.\mvnw -DskipTests package
+.\mvnw spring-boot:run
+```
+
+---
+
+If you want, I can also add example Postman collection JSON or expand the README with request/response samples for each endpoint (including example responses). Let me know which endpoints you want full examples for.

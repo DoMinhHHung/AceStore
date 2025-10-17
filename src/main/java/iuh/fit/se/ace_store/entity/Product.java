@@ -23,7 +23,9 @@ public class Product {
 
     private String brand;
 
-    private Double price;
+    private java.math.BigDecimal price;
+
+    private Integer stock;
 
     private String category;
     @Column(length = 2000)

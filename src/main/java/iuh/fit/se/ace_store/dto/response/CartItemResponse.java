@@ -2,6 +2,8 @@ package iuh.fit.se.ace_store.dto.response;
 
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -11,5 +13,5 @@ public class   CartItemResponse {
     private String productName;
     private String imageUrl;
     private int quantity;
-    private Double price;
+    private BigDecimal price;
 }

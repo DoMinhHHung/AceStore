@@ -6,9 +6,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface CartService {
-    ApiResponse addToCart(Long userId, CartRequest request);
-    ApiResponse getCart(Long userId);
-    ApiResponse updateCartItem(Long userId, Long productId, int quantity);
-    ApiResponse removeCartItem(Long userId, Long productId);
-    ApiResponse clearCart(Long userId);
+    // The service methods now accept the authenticated user's email (from Principal)
+    ApiResponse addToCart(String userEmail, CartRequest request);
+    ApiResponse getCart(String userEmail);
+    ApiResponse updateCartItem(String userEmail, Long productId, int quantity);
+    ApiResponse removeCartItem(String userEmail, Long productId);
+    ApiResponse clearCart(String userEmail);
 }

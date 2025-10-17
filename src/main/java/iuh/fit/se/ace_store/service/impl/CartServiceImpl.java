@@ -25,10 +25,10 @@ public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
 
 
-    @Override
-    public ApiResponse addToCart(Long userId, CartRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        @Override
+        public ApiResponse addToCart(String userEmail, CartRequest request) {
+                User user = userRepository.findByEmail(userEmail)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -36,7 +36,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUser(user)
                 .orElseGet(() -> cartRepository.save(Cart.builder()
                         .user(user)
-                        .totalPrice(0.0)
+                        .totalPrice(java.math.BigDecimal.ZERO)
                         .build()));
 
         CartItem item = cartItemRepository.findByCartAndProduct(cart, product)
@@ -50,12 +50,11 @@ public class CartServiceImpl implements CartService {
                 });
 
         item.setQuantity(item.getQuantity() + request.getQuantity());
-        item.setPrice(product.getPrice() * item.getQuantity());
+        item.setPrice(item.getProduct().getPrice().multiply(java.math.BigDecimal.valueOf(item.getQuantity())));
         cartItemRepository.save(item);
-
         cart.setTotalPrice(cart.getItems().stream()
-                .mapToDouble(CartItem::getPrice)
-                .sum());
+                .map(ci -> ci.getPrice() == null ? java.math.BigDecimal.ZERO : ci.getPrice())
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
         cartRepository.save(cart);
 
         return ApiResponse.success("Added to cart successfully", cartMapper.toCartResponse(cart));
@@ -63,52 +62,56 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ApiResponse getCart(Long userId) {
-        Cart cart = cartRepository.findByUserId(userId).orElseThrow(()-> new RuntimeException("Cart not found"));
+        public ApiResponse getCart(String userEmail) {
+                User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+                Cart cart = cartRepository.findByUser(user).orElseThrow(() -> new RuntimeException("Cart not found"));
         return ApiResponse.success("Cart successfully", cartMapper.toCartResponse(cart));
     }
 
-    @Override
-    public ApiResponse updateCartItem(Long userId, Long productId, int quantity) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+        @Override
+        public ApiResponse updateCartItem(String userEmail, Long productId, int quantity) {
+                User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+                Cart cart = cartRepository.findByUser(user)
+                                .orElseThrow(() -> new RuntimeException("Cart not found"));
         CartItem item = cartItemRepository.findByCartAndProductId(cart, productId)
                 .orElseThrow(() -> new RuntimeException("Item not found"));
 
         item.setQuantity(quantity);
-        item.setPrice(item.getProduct().getPrice() * quantity);
+        item.setPrice(item.getProduct().getPrice().multiply(java.math.BigDecimal.valueOf(quantity)));
         cartItemRepository.save(item);
 
         cart.setTotalPrice(cart.getItems().stream()
-                .mapToDouble(CartItem::getPrice)
-                .sum());
+                .map(ci -> ci.getPrice() == null ? java.math.BigDecimal.ZERO : ci.getPrice())
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
         cartRepository.save(cart);
 
         return ApiResponse.success("Cart updated", cartMapper.toCartResponse(cart));
     }
 
-    @Override
-    public ApiResponse removeCartItem(Long userId, Long productId) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+        @Override
+        public ApiResponse removeCartItem(String userEmail, Long productId) {
+                User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+                Cart cart = cartRepository.findByUser(user)
+                                .orElseThrow(() -> new RuntimeException("Cart not found"));
         cartItemRepository.deleteByCartAndProductId(cart, productId);
 
         cart.setTotalPrice(cart.getItems().stream()
-                .mapToDouble(CartItem::getPrice)
-                .sum());
+                .map(ci -> ci.getPrice() == null ? java.math.BigDecimal.ZERO : ci.getPrice())
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
         cartRepository.save(cart);
 
         return ApiResponse.success("Item removed", cartMapper.toCartResponse(cart));
 
     }
 
-    @Override
-    public ApiResponse clearCart(Long userId) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
-        cartItemRepository.deleteAll(cart.getItems());
-        cart.setTotalPrice(0.0);
-        cartRepository.save(cart);
-        return ApiResponse.success("Cart cleared", cartMapper.toCartResponse(cart));
-    }
+        @Override
+        public ApiResponse clearCart(String userEmail) {
+                User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+                Cart cart = cartRepository.findByUser(user)
+                                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                cartItemRepository.deleteAll(cart.getItems());
+                cart.setTotalPrice(java.math.BigDecimal.ZERO);
+                cartRepository.save(cart);
+                return ApiResponse.success("Cart cleared", cartMapper.toCartResponse(cart));
+        }
 }

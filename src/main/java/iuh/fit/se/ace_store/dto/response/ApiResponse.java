@@ -31,6 +31,11 @@ public class ApiResponse {
         return new ApiResponse(false, errorCode, message, null, null);
     }
 
+    public static ApiResponse success(Object data) {
+        return new ApiResponse(true, null, "Success", null, data);
+    }
+
+
     public boolean isSuccess() {
         return success;
     }
