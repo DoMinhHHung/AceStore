@@ -40,6 +40,8 @@ public class Product {
     private String monitor;
     private String os;
 
+    private String mainImage;
+
     @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image_url")

@@ -1,4 +1,4 @@
-package iuh.fit.se.ace_store.service.impl;
+package iuh.fit.se_ace_store.service.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -45,7 +45,7 @@ public class AuthServiceImpl {
                 helper.setText(htmlContent, true);
                 mailSender.send(message);
             } catch (MessagingException e) {
-                throw new RuntimeException("Lỗi gửi email: " + e.getMessage());
+                throw new RuntimeException("Error sending email: " + e.getMessage());
             }
         }
     }

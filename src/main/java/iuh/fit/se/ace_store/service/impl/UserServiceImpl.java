@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse register(AuthRequest.RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail()) || userRepository.existsByPhone(request.getPhone())) {
-            throw new RuntimeException("Email or Phone is already exists!!!");
+            throw new RuntimeException("Email or Phone already exists");
         }
         User user = User.builder()
                 .email(request.getEmail())
@@ -48,23 +48,23 @@ public class UserServiceImpl implements UserService {
                 .provider(AuthProvider.LOCAL)
                 .build();
 
-        // token xác minh (hết hạn sau 1 tiếng)
+        // verification token (expires in 1 hour)
         String token = UUID.randomUUID().toString();
         user.setVerificationToken(token);
         user.setTokenExpiration(LocalDateTime.now().plusHours(1));
 
         userRepository.save(user);
 
-    String verifyLink = verifyLinkProperty + token;
+        String verifyLink = verifyLinkProperty + token;
 
         String html = """
-            <h3>Xin chào %s,</h3>
-            <p>Cảm ơn bạn đã đăng ký tại <b>PC-Store</b>!</p>
-            <p>Nhấn vào link bên dưới để xác nhận tài khoản (hết hạn sau 1 tiếng):</p>
-            <a href="%s">Xác nhận tài khoản</a>
+            <h3>Hello %s,</h3>
+            <p>Thank you for registering at <b>Ace-Store</b>!</p>
+            <p>Click the link below to verify your account (expires in 1 hour):</p>
+            <a href="%s">Verify account</a>
             """.formatted(user.getFirstName(), verifyLink);
 
-        emailService.sendHtmlEmail(user.getEmail(), "Xác nhận tài khoản - PC Store", html);
+        emailService.sendHtmlEmail(user.getEmail(), "Account verification - Ace Store", html);
 
         return toResponse(user);
     }
@@ -73,14 +73,14 @@ public class UserServiceImpl implements UserService {
     public UserResponse login(AuthRequest.LoginRequest request) {
         User user = userRepository.findByEmail(request.getUsername())
                 .or(() -> userRepository.findByPhone(request.getUsername()))
-                .orElseThrow(() -> new RuntimeException("Account not exists!!!"));
+                .orElseThrow(() -> new RuntimeException("Account not found"));
 
         if (!user.isEnabled()) {
-            throw new RuntimeException("Account not activated yet! Check your email.");
+            throw new RuntimeException("Account not activated yet. Check your email.");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Wrong password!!!");
+            throw new RuntimeException("Wrong password");
         }
 
         return toResponse(user);
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApiResponse updateUserProfile(String email, AuthRequest.UpdateUserRequest dto) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
@@ -99,42 +99,42 @@ public class UserServiceImpl implements UserService {
         user.setAddress(dto.getAddress());
 
         userRepository.save(user);
-        return ApiResponse.success("Cập nhật thông tin thành công!", user);
+        return ApiResponse.success("Profile updated successfully", user);
     }
 
     @Override
     public ApiResponse changePassword(String email, AuthRequest.ChangePasswordRequest dto) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
-            return ApiResponse.error("Mật khẩu cũ không đúng!");
+            return ApiResponse.error("Old password is incorrect");
         }
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
-        return ApiResponse.success("Đổi mật khẩu thành công!");
+        return ApiResponse.success("Password changed successfully");
     }
 
     @Override
     public ApiResponse updateUserRole(Long userId, String roleName) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user ID: " + userId));
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
         try {
             Role newRole = Role.valueOf(roleName.toUpperCase());
             user.setRole(newRole);
             userRepository.save(user);
-            return ApiResponse.success("Cập nhật quyền thành công!", user);
+            return ApiResponse.success("Role updated successfully", user);
         } catch (IllegalArgumentException e) {
-            return ApiResponse.error("Role không hợp lệ!");
+            return ApiResponse.error("Invalid role");
         }
     }
 
     @Override
     public ApiResponse getCurrentUser() {
-    User user = getAuthenticatedUser();
-    return ApiResponse.success("Lấy thông tin user thành công!", toResponse(user));
+        User user = getAuthenticatedUser();
+        return ApiResponse.success("User info retrieved successfully", toResponse(user));
     }
 
     private User getAuthenticatedUser() {

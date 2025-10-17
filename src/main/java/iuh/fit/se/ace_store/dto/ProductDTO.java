@@ -14,6 +14,7 @@ public class ProductDTO {
     private String name;
     private String brand;
     private java.math.BigDecimal price;
+    private Integer stock;
     private String category;
     private String description;
 
@@ -25,6 +26,9 @@ public class ProductDTO {
     private String psu;
     private String monitor;
     private String os;
+
+    // mainImage is the representative image (first image in images list)
+    private String mainImage;
 
     private List<String> images;
     private List<String> videos;
